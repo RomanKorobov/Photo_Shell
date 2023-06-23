@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_photos"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.photoshell.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_homePhotoFragment"
+            app:destination="@id/homePhotoFragment"
+            app:popUpTo="@id/homeFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/albumsFragment"
+        android:name="com.example.photoshell.ui.albums.AlbumsFragment"
+        android:label="AlbumsFragment"
+        tools:layout="@layout/fragment_albums">
+        <action
+            android:id="@+id/action_albumsFragment_to_collectionPhotosFragment"
+            app:destination="@id/collectionPhotosFragment"
+            app:popUpTo="@id/albumsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.photoshell.ui.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_homePhotoFragment"
+            app:destination="@id/homePhotoFragment"
+            app:popUpTo="@id/profileFragment" />
+    </fragment>
+    <action
+        android:id="@+id/go_to_home"
+        app:destination="@id/homeFragment" />
+
+    <action
+        android:id="@+id/go_to_albums"
+        app:destination="@id/albumsFragment" />
+
+    <action
+        android:id="@+id/go_to_profile"
+        app:destination="@id/profileFragment" />
+    <fragment
+        android:id="@+id/homePhotoFragment"
+        android:name="com.example.photoshell.ui.home.photo.HomePhotoFragment"
+        android:label="HomePhotoFragment"
+        tools:layout="@layout/fragment_home_photo">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <argument
+            android:name="photoUrl"
+            app:argType="string" />
+        <argument
+            android:name="user"
+            app:argType="string" />
+        <argument
+            android:name="downloadLink"
+            app:argType="string" />
+        <argument
+            android:name="link"
+            app:argType="string" />
+        <argument
+            android:name="likedByUser"
+            app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/collectionPhotosFragment"
+        android:name="com.example.photoshell.ui.albums.photos.CollectionPhotosFragment"
+        android:label="CollectionPhotosFragment"
+        tools:layout="@layout/fragment_collection_photos">
+        <argument
+            android:name="collectionId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_collectionPhotosFragment_to_homePhotoFragment"
+            app:destination="@id/homePhotoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.photoshell.ui.home.search.SearchFragment"
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_homePhotoFragment"
+            app:destination="@id/homePhotoFragment" />
+    </fragment>
+</navigation>

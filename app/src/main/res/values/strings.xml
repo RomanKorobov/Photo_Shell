@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Photo Shell</string>
+    <string name="sign_in">Sign in</string>
+    <string name="home">Home</string>
+    <string name="album">Albums</string>
+    <string name="profile">Profile</string>
+    <string name="search">search</string>
+    <string name="photos_in_collection">%d photos</string>
+    <string name="log_out">Log out</string>
+    <string name="likes">likes</string>
+    <string name="search_photos">  Search photos</string>
+    <string name="onboarding_one"> Search and download photos by your favourite topic</string>
+    <string name="onboarding_two"> Save photos to your \n favourites collection</string>
+    <string name="onboarding_three"> Surf throw others \n people collections</string>
+    <string name="default_text_res"> </string>
+</resources>
