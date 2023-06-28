@@ -22,5 +22,13 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             childFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.findNavController()
         binding.bottomNavigationView.setupWithNavController(navController)
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            if (item.itemId != navController.currentDestination?.id) {
+                navController.navigate(item.itemId)
+                true
+            } else {
+                false
+            }
+        }
     }
 }

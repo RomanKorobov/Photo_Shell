@@ -53,19 +53,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchToolbar">
 
-        <EditText
-            android:id="@+id/search_view_edit_text"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/teal200"
-            android:hint="@string/search_photos" />
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/startSearchButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="end"
-            android:background="@drawable/ic_search_24" />
+            <EditText
+                android:id="@+id/search_view_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@color/teal200"
+                android:hint="@string/search_photos" />
+
+            <Button
+                android:id="@+id/startSearchButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_search_24" />
+        </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
 
