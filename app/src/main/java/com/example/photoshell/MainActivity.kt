@@ -37,13 +37,11 @@ class MainActivity : AppCompatActivity() {
         Uri.parse(AuthConfig.REDIRECT_URI)
     ).setScope(AuthConfig.SCOPE).build()
     private lateinit var viewPager: ViewPager2
-    private lateinit var indicator: com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
-    private lateinit var adapter: OnBoardingAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewPager = findViewById(R.id.viewPager)
-        adapter = OnBoardingAdapter(this)
+        val adapter = OnBoardingAdapter(this)
         adapter.addFragment(
             OnBoardingScreen(
                 R.string.onboarding_one,
@@ -66,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
         viewPager.adapter = adapter
-        indicator = findViewById(R.id.spring_dots_indicator)
+        val indicator: com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator = findViewById(R.id.spring_dots_indicator)
         indicator.setViewPager2(viewPager)
         if (intent.data != null) {
             val code = Uri.parse(intent.data.toString()).getQueryParameter("code")
