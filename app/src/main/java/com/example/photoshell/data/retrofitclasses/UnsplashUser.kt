@@ -1,9 +1,8 @@
 package com.example.photoshell.data.retrofitclasses
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class UnsplashUser(
@@ -23,22 +22,4 @@ data class UnsplashUser(
     @SerializedName("profile_image")
     val profileImage: UnsplashUrls,
     val links: UnsplashLinks
-) : Parcelable {
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
-        parcel.writeString(username)
-        parcel.writeString(name)
-        parcel.writeString(portfolioUrl)
-        parcel.writeString(bio)
-        parcel.writeString(location)
-        parcel.writeInt(totalLikes)
-        parcel.writeInt(totalPhotos)
-        parcel.writeInt(totalCollection)
-        parcel.writeParcelable(profileImage, flags)
-        parcel.writeParcelable(links, flags)
-    }
-}
+) : Parcelable
