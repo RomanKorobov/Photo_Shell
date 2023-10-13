@@ -6,6 +6,6 @@ import com.example.photoshell.data.Network
 class App: Application() {
     override fun onCreate() {
         super.onCreate()
-        Network.getStarted()
+        Network
     }
 }
