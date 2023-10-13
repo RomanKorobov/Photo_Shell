@@ -50,20 +50,23 @@ object TokenStorage {
     }
 
     fun getToken(context: Context): String? {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        val privateKeyEntry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.PrivateKeyEntry
-        val privateKey = privateKeyEntry.privateKey
-        val prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val encryptedToken = prefs.getString("token", null)
+        try {
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+            val privateKeyEntry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.PrivateKeyEntry
+            val privateKey = privateKeyEntry.privateKey
+            val prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+            val encryptedToken = prefs.getString("token", null)
 
-        if (encryptedToken != null) {
-            val cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
-            cipher.init(Cipher.DECRYPT_MODE, privateKey)
-            val decryptedToken = cipher.doFinal(Base64.decode(encryptedToken, Base64.DEFAULT))
-            return String(decryptedToken, Charsets.UTF_8)
+            return if (encryptedToken != null) {
+                val cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
+                cipher.init(Cipher.DECRYPT_MODE, privateKey)
+                val decryptedToken = cipher.doFinal(Base64.decode(encryptedToken, Base64.DEFAULT))
+                String(decryptedToken, Charsets.UTF_8)
+            } else null
+        } catch (n: NullPointerException) {
+            return null
         }
-        return null
     }
 
     fun deleteToken(context: Context) {

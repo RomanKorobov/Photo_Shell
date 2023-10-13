@@ -64,7 +64,8 @@ class MainActivity : AppCompatActivity() {
             )
         )
         viewPager.adapter = adapter
-        val indicator: com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator = findViewById(R.id.spring_dots_indicator)
+        val indicator: com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator =
+            findViewById(R.id.spring_dots_indicator)
         indicator.setViewPager2(viewPager)
         if (intent.data != null) {
             val code = Uri.parse(intent.data.toString()).getQueryParameter("code")
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 exception?.printStackTrace()
             }
         }
-        binding.loginButton.setOnClickListener { loginStart() }
+        binding.loginButton.setOnClickListener { checkIfLoggedIn() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -104,22 +105,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginStart() {
-        try {
-            if (TokenStorage.getToken(this) != null) {
-                supportFragmentManager.beginTransaction().replace(R.id.container, MainFragment())
-                    .commit()
-            }
-        } catch (n: NullPointerException) {
-            authService.performAuthorizationRequest(
-                authRequest,
-                PendingIntent.getActivity(
-                    this,
-                    0,
-                    Intent(this, MainActivity::class.java),
-                    PendingIntent.FLAG_IMMUTABLE
-                )
+    private fun checkIfLoggedIn() {
+        if (TokenStorage.getToken(this) != null) {
+            supportFragmentManager.beginTransaction().replace(R.id.container, MainFragment())
+                .commit()
+        } else {
+            val newAuthorizationIntent = PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, MainActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE
             )
+            authService.performAuthorizationRequest(authRequest, newAuthorizationIntent)
         }
     }
 }
