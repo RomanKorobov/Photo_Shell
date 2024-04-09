@@ -46,21 +46,21 @@ class MainActivity : AppCompatActivity() {
             OnBoardingScreen(
                 R.string.onboarding_one,
                 R.color.teal200,
-                R.drawable.onboarding_one
+                R.drawable.search_onboarding
             )
         )
         adapter.addFragment(
             OnBoardingScreen(
                 R.string.onboarding_two,
                 R.color.green_a400,
-                R.drawable.onboarding_two
+                R.drawable.save_onboarding
             )
         )
         adapter.addFragment(
             OnBoardingScreen(
                 R.string.onboarding_three,
                 R.color.blue_grey_100,
-                R.drawable.onboarding_three
+                R.drawable.surf_onboarding
             )
         )
         viewPager.adapter = adapter
