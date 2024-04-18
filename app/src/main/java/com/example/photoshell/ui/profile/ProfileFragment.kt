@@ -19,6 +19,7 @@ import com.example.photoshell.R
 import com.example.photoshell.databinding.FragmentProfileBinding
 import com.example.photoshell.ui.home.PreviewPhotoAdapter
 import com.example.photoshell.utils.autoCleared
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -74,23 +75,29 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun bindViewModel(context: Context) {
-        viewModel.profile.observe(viewLifecycleOwner) {
-            binding.textViewProfileFirstName.text = it.firstName
-            binding.textViewProfileLastName.text = it.lastName
-            binding.textViewProfileBio.text = getString(R.string.likes)
-        }
-        viewModel.likedPhotos.observe(viewLifecycleOwner) {
-            fragmentAdapter.list = it
-            fragmentAdapter.notifyDataSetChanged()
-            if (fragmentAdapter.list.isEmpty()) {
-                binding.textViewProfileBio.text = viewModel.profile.value?.bio
-            } else {
+        lifecycleScope.launch {
+            viewModel.profileFlow.collect {
+                binding.textViewProfileFirstName.text = it.firstName
+                binding.textViewProfileLastName.text = it.lastName
                 binding.textViewProfileBio.text = getString(R.string.likes)
             }
         }
-        viewModel.avatarImage.observe(viewLifecycleOwner) {
-            Glide.with(context).load(it).placeholder(R.drawable.avatar_placeholder)
-                .into(binding.imageViewAvatar)
+        lifecycleScope.launch {
+            viewModel.likedPhotosFlow.collect {
+                fragmentAdapter.list = it
+                fragmentAdapter.notifyDataSetChanged()
+                if (fragmentAdapter.list.isEmpty()) {
+                    binding.textViewProfileBio.text = viewModel.profileFlow.value?.bio
+                } else {
+                    binding.textViewProfileBio.text = getString(R.string.likes)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.avatarImageFlow.collect {
+                Glide.with(context).load(it).placeholder(R.drawable.avatar_placeholder)
+                    .into(binding.imageViewAvatar)
+            }
         }
         viewModel.getMyProfile()
     }

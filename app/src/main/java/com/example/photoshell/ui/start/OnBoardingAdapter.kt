@@ -1,4 +1,4 @@
-package com.example.photoshell.ui
+package com.example.photoshell.ui.start
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

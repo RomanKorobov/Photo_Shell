@@ -8,6 +8,7 @@
     <string name="photos_in_collection">%d photos</string>
     <string name="log_out">Log out</string>
     <string name="likes">likes</string>
+    <string name="auth_fail">Authorization server failed</string>
     <string name="search_photos">  Search photos</string>
     <string name="onboarding_one"> Search and download photos by your favourite topic</string>
     <string name="onboarding_two"> Save photos to your \n favourites collection</string>

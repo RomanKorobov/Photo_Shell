@@ -2,40 +2,34 @@ package com.example.photoshell.ui.profile
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.photoshell.data.retrofitclasses.MyProfile
 import com.example.photoshell.data.retrofitclasses.UnsplashPhoto
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ProfileViewModel(app: Application) : AndroidViewModel(app) {
     private val repository = ProfileRepository(getApplication())
     private val handler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
     }
-    private var profileMutableLiveData = MutableLiveData<MyProfile>()
-    val profile: MutableLiveData<MyProfile>
-        get() = profileMutableLiveData
-    private var likedPhotosMutableLiveData = MutableLiveData<List<UnsplashPhoto>>()
-    val likedPhotos: MutableLiveData<List<UnsplashPhoto>>
-        get() = likedPhotosMutableLiveData
-    private var mutableAvatarImageLiveData = MutableLiveData<String?>(null)
-    val avatarImage: MutableLiveData<String?>
-        get() = mutableAvatarImageLiveData
+    lateinit var profileFlow: MutableStateFlow<MyProfile>
+    lateinit var likedPhotosFlow: MutableStateFlow<List<UnsplashPhoto>>
+    lateinit var avatarImageFlow: MutableStateFlow<String>
 
     fun getMyProfile() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            val theProfile = repository.getMyProfile()
-            val user = repository.getUser(theProfile.username)
-            avatarImage.postValue(user.profileImage.small)
-            val thePhotos = withContext(Dispatchers.IO) {
-                repository.getLikedPhotos(user.username)
+            profileFlow = repository.getMyProfile() as MutableStateFlow<MyProfile>
+            profileFlow.collect {
+                val user = repository.getUser(it.username)
+                avatarImageFlow.value = user.profileImage.small ?: ""
+                likedPhotosFlow.value = async {
+                    repository.getLikedPhotos(user.username)
+                }.await()
             }
-            profileMutableLiveData.postValue(theProfile)
-            likedPhotosMutableLiveData.postValue(thePhotos)
         }
     }
 
@@ -45,10 +39,12 @@ class ProfileViewModel(app: Application) : AndroidViewModel(app) {
 
     fun addPhotos() {
         viewModelScope.launch(Dispatchers.IO + handler) {
-            val newPhotos = repository.getLikedPhotos(profile.value?.username!!)
-            val newListOfPhoto: List<UnsplashPhoto> =
-                likedPhotos.value?.plus(newPhotos) ?: newPhotos
-            likedPhotosMutableLiveData.postValue(newListOfPhoto)
+            profileFlow.collect {
+                val newPhotos = repository.getLikedPhotos(it.username)
+                val newListOfPhoto: List<UnsplashPhoto> =
+                    likedPhotosFlow.value.plus(newPhotos)
+                likedPhotosFlow.value = newListOfPhoto
+            }
         }
     }
 

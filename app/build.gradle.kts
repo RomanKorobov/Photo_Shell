@@ -48,6 +48,9 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.11.0")
     implementation("com.tbuonomo:dotsindicator:4.2")
 
+    //flow
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+
     //Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.6.0")

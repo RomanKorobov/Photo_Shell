@@ -1,4 +1,4 @@
-package com.example.photoshell.ui
+package com.example.photoshell.ui.start
 
 import android.os.Bundle
 import android.view.LayoutInflater

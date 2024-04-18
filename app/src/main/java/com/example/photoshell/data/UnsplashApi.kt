@@ -5,7 +5,11 @@ import com.example.photoshell.data.retrofitclasses.MyProfile
 import com.example.photoshell.data.retrofitclasses.SearchPhotoResult
 import com.example.photoshell.data.retrofitclasses.UnsplashPhoto
 import com.example.photoshell.data.retrofitclasses.UnsplashUser
+import kotlinx.coroutines.flow.Flow
+import okhttp3.ResponseBody
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -70,7 +74,7 @@ interface UnsplashApi {
     ): List<UnsplashPhoto>
 
     @GET("/me")
-    suspend fun getMyProfile(@Header("Authorization") accessToken: String): MyProfile
+    suspend fun getMyProfile(@Header("Authorization") accessToken: String): Flow<MyProfile>
 
     @GET("/users/{username}")
     suspend fun getUser(
