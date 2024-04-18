@@ -1,8 +1,7 @@
 package com.example.photoshell.data
 
 object AuthConfig {
-    const val BASE_URL = "https://unsplash.com"
-    const val CLIENT_ID = "461097"
+    const val BASE_URL = "https://api.unsplash.com"
     const val ACCESS_KEY = "JYe8snKzih70lrvly0C3Mdi0ITQvBhY2xvk7c-V5S9I"
     const val CLIENT_SECRET = "P93TrpijS_2-2J_LcTuHrtaGPSO_3qQa1wrzSRh-OYo"
     const val REDIRECT_URI = "com.example.photoshell://oauth2"

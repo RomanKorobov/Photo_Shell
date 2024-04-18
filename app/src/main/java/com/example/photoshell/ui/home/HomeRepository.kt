@@ -1,6 +1,7 @@
 package com.example.photoshell.ui.home
 
 import android.content.Context
+import android.util.Log
 import com.example.photoshell.data.Network
 import com.example.photoshell.data.TokenStorage
 import com.example.photoshell.data.retrofitclasses.UnsplashPhoto
