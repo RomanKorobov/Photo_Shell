@@ -1,80 +1,62 @@
 package com.example.photoshell.data
 
 import android.content.Context
-import android.security.KeyPairGeneratorSpec
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import android.util.Base64
-import java.math.BigInteger
 import java.security.KeyPairGenerator
 import java.security.KeyStore
-import java.util.Calendar
 import javax.crypto.Cipher
-import javax.security.auth.x500.X500Principal
 
 object TokenStorage {
-    private const val KEY_ALIAS = "TokenKey"
+    private const val KEYSTORE_ALIAS = "Token key store"
+    private val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore")
+    private val spec = KeyGenParameterSpec.Builder(KEYSTORE_ALIAS, KeyProperties.PURPOSE_DECRYPT)
+        .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+        .build()
+    private val kpGenerator: KeyPairGenerator =
+        KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore")
+
     fun saveToken(context: Context, token: String) {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        if (!keyStore.containsAlias(KEY_ALIAS)) {
-            val start = Calendar.getInstance()
-            val end = Calendar.getInstance()
-            end.add(Calendar.YEAR, 25)
-
-            val spec = KeyPairGeneratorSpec.Builder(context)
-                .setAlias(KEY_ALIAS)
-                .setSubject(X500Principal("CN=$KEY_ALIAS"))
-                .setSerialNumber(BigInteger.ONE)
-                .setStartDate(start.time)
-                .setEndDate(end.time)
-                .build()
-
-            val kpGenerator = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore")
+        if (!keyStore.containsAlias(KEYSTORE_ALIAS)) {
+            keyStore.load(null)
             kpGenerator.initialize(spec)
-            kpGenerator.generateKeyPair()
+            kpGenerator.genKeyPair()
         }
-        // Получение открытого ключа из хранилища
-        val privateKeyEntry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.PrivateKeyEntry
-        val publicKey = privateKeyEntry.certificate.publicKey
-
-        // Шифрование токена с помощью открытого ключа
-        val cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
+        val publicKey = keyStore.getCertificate(KEYSTORE_ALIAS).publicKey
+        val cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
         cipher.init(Cipher.ENCRYPT_MODE, publicKey)
-        val encryptedToken = Base64.encodeToString(
-            cipher.doFinal(token.toByteArray(Charsets.UTF_8)),
-            Base64.DEFAULT
-        )
-
-        // Сохранение зашифрованного токена в SharedPreferences
+        val encryptedToken = cipher.doFinal(token.toByteArray(Charsets.UTF_8))
+        val encryptedStr = Base64.encodeToString(encryptedToken, Base64.DEFAULT)
         val prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        prefs.edit().putString("token", encryptedToken).apply()
+        prefs.edit().putString("token", encryptedStr).apply()
     }
 
     fun getToken(context: Context): String? {
-        try {
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-            val privateKeyEntry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.PrivateKeyEntry
-            val privateKey = privateKeyEntry.privateKey
+        return try {
             val prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-            val encryptedToken = prefs.getString("token", null)
-
-            return if (encryptedToken != null) {
-                val cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
+            val encryptedStr = prefs.getString("token", null)
+            if (encryptedStr != null) {
+                val privateKey = keyStore.getKey(KEYSTORE_ALIAS, null)
+                val cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
                 cipher.init(Cipher.DECRYPT_MODE, privateKey)
-                val decryptedToken = cipher.doFinal(Base64.decode(encryptedToken, Base64.DEFAULT))
+                val decryptedToken = cipher.doFinal(Base64.decode(encryptedStr, Base64.DEFAULT))
                 String(decryptedToken, Charsets.UTF_8)
             } else null
         } catch (n: NullPointerException) {
-            return null
+            null
         }
     }
 
     fun deleteToken(context: Context) {
         val prefs = context.getSharedPreferences("token", Context.MODE_PRIVATE)
-        prefs.edit().remove("token").apply()
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        keyStore.deleteEntry(KEY_ALIAS)
+        if (prefs.contains("token")) {
+            prefs.edit().remove("token").apply()
+        }
+        if (keyStore.containsAlias(KEYSTORE_ALIAS)) {
+            keyStore.deleteEntry(KEYSTORE_ALIAS)
+        }
     }
 
 }
