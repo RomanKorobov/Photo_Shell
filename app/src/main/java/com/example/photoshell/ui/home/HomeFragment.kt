@@ -6,12 +6,15 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.photoshell.R
+import com.example.photoshell.data.KeyStoreManager
 import com.example.photoshell.databinding.FragmentHomeBinding
 import com.example.photoshell.utils.autoCleared
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var fragmentAdapter: PreviewPhotoAdapter by autoCleared()
@@ -73,6 +76,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun bindViewModel() {
         observeHomePhotos()
-        viewModel.getPhotos()
+        lifecycleScope.launch {
+            KeyStoreManager.tokenFlow.collect {
+                viewModel.updateAccessToken()
+                viewModel.getPhotos()
+            }
+        }
     }
 }

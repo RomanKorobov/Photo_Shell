@@ -2,18 +2,15 @@ package com.example.photoshell.ui.start
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.photoshell.R
-import com.example.photoshell.data.TokenStorage
+import com.example.photoshell.data.KeyStoreManager
 import com.example.photoshell.databinding.FragmentStartBinding
 import com.example.photoshell.ui.MainFragment
-import kotlinx.coroutines.launch
 
 class StartFragment : Fragment(R.layout.fragment_start) {
     private val binding: FragmentStartBinding by viewBinding()
@@ -54,7 +51,7 @@ class StartFragment : Fragment(R.layout.fragment_start) {
     }
 
     private fun checkIfLoggedIn() {
-        if (TokenStorage.getToken(requireContext()) != null) {
+        if (KeyStoreManager.get(requireContext()) != null) {
             parentFragmentManager.beginTransaction().replace(R.id.container, MainFragment())
                 .commit()
         } else {
@@ -63,16 +60,14 @@ class StartFragment : Fragment(R.layout.fragment_start) {
     }
 
     private fun checkIntent() {
-        lifecycleScope.launch {
-            val dataStr = arguments?.getString("intent")
-            if (dataStr != null) {
-                val code = Uri.parse(dataStr).getQueryParameter("code") ?: ""
-                launch {
-                    viewModel.performTokenRequest(code)
-                }.join()
-                parentFragmentManager.beginTransaction().replace(R.id.container, MainFragment())
-                    .commit()
-            }
+        val dataStr = arguments?.getString("intent")
+        val logout = arguments?.getBoolean("logout")
+        if (logout == true) return
+        if (dataStr != null) {
+            val code = Uri.parse(dataStr).getQueryParameter("code") ?: ""
+            viewModel.performTokenRequest(code)
+            parentFragmentManager.beginTransaction().replace(R.id.container, MainFragment())
+                .commit()
         }
     }
 }

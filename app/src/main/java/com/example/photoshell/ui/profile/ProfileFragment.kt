@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -29,10 +30,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initLikedList()
-        bindViewModel(requireContext())
+        viewModel.getMyProfile()
+        bindViewModel()
         binding.logoutButton.setOnClickListener {
             viewModel.logout()
-            startActivity(Intent(requireContext(), MainActivity::class.java))
+            val bundle = Bundle()
+            bundle.putBoolean("logout", true)
+            startActivity(Intent(requireContext(), MainActivity::class.java), bundle)
         }
     }
 
@@ -56,30 +60,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
             adapter = fragmentAdapter
-            this.setOnTouchListener { _, event ->
-                val lastVisibleItemPosition =
-                    (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                val itemCount = (layoutManager as LinearLayoutManager).itemCount
-                if (lastVisibleItemPosition == itemCount - 1) {
-                    if (event.action == MotionEvent.ACTION_UP) {
-                        viewModel.addPhotos()
-                        true
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                }
-            }
         }
     }
 
-    private fun bindViewModel(context: Context) {
+    private fun bindViewModel() {
         lifecycleScope.launch {
             viewModel.profileFlow.collect {
-                binding.textViewProfileFirstName.text = it.firstName
-                binding.textViewProfileLastName.text = it.lastName
-                binding.textViewProfileBio.text = getString(R.string.likes)
+                if (it != null) {
+                    binding.textViewProfileFirstName.text = it.firstName
+                    binding.textViewProfileLastName.text = it.lastName
+                    binding.textViewProfileBio.text = getString(R.string.likes)
+                }
             }
         }
         lifecycleScope.launch {
@@ -87,16 +78,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 fragmentAdapter.list = it
                 fragmentAdapter.notifyDataSetChanged()
                 if (fragmentAdapter.list.isEmpty()) {
+                    Log.d("ExceptionTag", "empty")
                     binding.textViewProfileBio.text = viewModel.profileFlow.value?.bio
                 } else {
+                    Log.d("ExceptionTag", "not empty")
                     binding.textViewProfileBio.text = getString(R.string.likes)
                 }
             }
         }
         lifecycleScope.launch {
             viewModel.avatarImageFlow.collect {
-                Glide.with(context).load(it).placeholder(R.drawable.avatar_placeholder)
-                    .into(binding.imageViewAvatar)
+                Glide.with(requireContext()).load(it).into(binding.imageViewAvatar)
             }
         }
         viewModel.getMyProfile()

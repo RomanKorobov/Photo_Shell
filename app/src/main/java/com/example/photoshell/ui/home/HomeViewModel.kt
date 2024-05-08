@@ -40,4 +40,8 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
             onGetPhoto(photo)
         }
     }
+
+    fun updateAccessToken() {
+        repository.updateAccessToken()
+    }
 }

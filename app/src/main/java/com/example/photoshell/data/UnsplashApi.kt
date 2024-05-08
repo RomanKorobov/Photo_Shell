@@ -74,7 +74,7 @@ interface UnsplashApi {
     ): List<UnsplashPhoto>
 
     @GET("/me")
-    suspend fun getMyProfile(@Header("Authorization") accessToken: String): Flow<MyProfile>
+    suspend fun getMyProfile(@Header("Authorization") accessToken: String): MyProfile
 
     @GET("/users/{username}")
     suspend fun getUser(
@@ -86,6 +86,7 @@ interface UnsplashApi {
     suspend fun getUserLikedPhotos(
         @Header("Authorization") accessToken: String,
         @Path("username") username: String,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
     ): List<UnsplashPhoto>
 }

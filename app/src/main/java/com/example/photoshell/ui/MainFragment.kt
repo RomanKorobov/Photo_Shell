@@ -1,6 +1,7 @@
 package com.example.photoshell.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
@@ -18,6 +19,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun initNavigation() {
+        Log.d("ExceptionTag", "Init navigation")
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.findNavController()

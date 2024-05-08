@@ -9,5 +9,7 @@ data class UnsplashUrls(
     val full: String?,
     val regular: String?,
     val small: String?,
+    val medium: String?,
+    val large: String?,
     val thumb: String?
 ) : Parcelable

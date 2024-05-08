@@ -9,8 +9,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (intent != null) {
+            val logout = intent.getBooleanExtra("logout", false)
             val bundle = Bundle()
             bundle.putString("intent", intent.dataString)
+            bundle.putBoolean("logout", logout)
             val newFragment = StartFragment()
             newFragment.arguments = bundle
             supportFragmentManager.beginTransaction().replace(R.id.container, newFragment).commit()

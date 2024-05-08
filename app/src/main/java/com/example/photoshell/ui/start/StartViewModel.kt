@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,10 +11,8 @@ import com.example.photoshell.MainActivity
 import com.example.photoshell.R
 import com.example.photoshell.data.AuthConfig
 import com.example.photoshell.data.Network
-import com.example.photoshell.data.TokenStorage
+import com.example.photoshell.data.KeyStoreManager
 import com.google.gson.JsonObject
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationService
@@ -29,7 +26,6 @@ import okhttp3.Response
 import java.io.IOException
 
 class StartViewModel(app: Application) : AndroidViewModel(app) {
-    private val api = Network.api
     private val serviceConfig = AuthorizationServiceConfiguration(
         Uri.parse(AuthConfig.AUTHORIZE_URI),
         Uri.parse(AuthConfig.TOKEN_URI)
@@ -42,11 +38,8 @@ class StartViewModel(app: Application) : AndroidViewModel(app) {
         Uri.parse(AuthConfig.REDIRECT_URI)
     ).setScope(AuthConfig.SCOPE).build()
 
-    private val handler =
-        CoroutineExceptionHandler { _, ex -> Log.e("ExceptionTAG", ex.stackTraceToString()) }
-
     fun performAuthorizationRequest() {
-        viewModelScope.launch(Dispatchers.IO + handler) {
+        viewModelScope.launch {
             val pendingIntent = PendingIntent.getActivity(
                 getApplication(),
                 0,
@@ -58,8 +51,7 @@ class StartViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun performTokenRequest(code: String) {
-        Log.d("ExceptionTag", "access token request")
-        viewModelScope.launch(Dispatchers.IO + handler) {
+        viewModelScope.launch {
             val requestBody = FormBody.Builder()
                 .add("client_id", AuthConfig.ACCESS_KEY)
                 .add("client_secret", AuthConfig.CLIENT_SECRET)
@@ -76,12 +68,13 @@ class StartViewModel(app: Application) : AndroidViewModel(app) {
                     Toast.makeText(getApplication(), R.string.auth_fail, Toast.LENGTH_SHORT).show()
                 }
                 override fun onResponse(call: Call, response: Response) {
-                    Log.d("ExceptionTag", response.body?.string() ?: "")
-                    val jsonObject =
-                        Network.gson.fromJson(response.body!!.string(), JsonObject::class.java)
-                    val accessToken = jsonObject.getAsJsonPrimitive("access_token").asString
-                    Log.d("ExceptionTag", "access token $accessToken")
-                    TokenStorage.saveToken(getApplication(), accessToken)
+                    val jsonResponse = response.body?.string() ?: ""
+                    try {
+                        val jsonObject =
+                            Network.gson.fromJson(jsonResponse, JsonObject::class.java)
+                        val accessToken = jsonObject.getAsJsonPrimitive("access_token").asString
+                        KeyStoreManager.set(accessToken, getApplication())
+                    } catch (_: RuntimeException) {}
                 }
             })
         }

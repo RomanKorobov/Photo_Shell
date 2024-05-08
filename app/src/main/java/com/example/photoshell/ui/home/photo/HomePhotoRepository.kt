@@ -8,11 +8,11 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
+import com.example.photoshell.data.KeyStoreManager
 import com.example.photoshell.data.Network
-import com.example.photoshell.data.TokenStorage
 
 class HomePhotoRepository(private val context: Context) {
-    private val token = TokenStorage.getToken(context)
+    private val token = KeyStoreManager.get(context)
     private val accessToken = "Bearer $token"
     private val api = Network.api
     private val downloadManager =
