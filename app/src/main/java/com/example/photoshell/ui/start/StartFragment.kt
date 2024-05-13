@@ -26,7 +26,7 @@ class StartFragment : Fragment(R.layout.fragment_start) {
             OnBoardingScreen(
                 R.string.onboarding_one,
                 R.color.teal200,
-                R.drawable.search_onboarding
+                R.drawable.generated_topic
             )
         )
         adapter.addFragment(
